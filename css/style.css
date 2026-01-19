@@ -1,0 +1,49 @@
+:root {
+  --primary-blue: #007bff;
+}
+
+body {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.navbar {
+  background-color: var(--primary-blue) !important;
+}
+
+.card {
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1) !important;
+}
+
+.table thead th {
+  border-top: none;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  letter-spacing: 1px;
+}
+
+.btn-group-sm .btn {
+  margin: 0 2px;
+}
+
+/* Стили для уведомлений */
+#alert-container {
+  position: fixed;
+  top: 70px;
+  right: 20px;
+  z-index: 1050;
+  min-width: 300px;
+}
+
+footer {
+  margin-top: auto;
+}

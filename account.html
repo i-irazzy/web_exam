@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Личный кабинет - Learn Russian</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body class="bg-light">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
+      <div class="container">
+        <a class="navbar-brand d-flex align-items-center" href="index.html">
+          <img src="img/logo.png" alt="Logo" width="30" height="30" class="me-2" />
+          Learn Russian
+        </a>
+        <div class="navbar-nav ms-auto">
+          <a class="nav-link text-white" href="index.html">На главную</a>
+        </div>
+      </div>
+    </nav>
+
+    <div id="alert-container" class="container mt-3"></div>
+
+    <main class="container my-5 bg-white p-4 rounded shadow-sm">
+      <h2 class="mb-4">Ваши заявки</h2>
+
+      <div class="table-responsive">
+        <table class="table table-hover border">
+          <thead class="table-light">
+            <tr>
+              <th>№</th>
+              <th>Название курса</th>
+              <th>Дата занятия</th>
+              <th>Стоимость</th>
+              <th>Действия</th>
+            </tr>
+          </thead>
+          <tbody id="orders-table-body">
+            <!-- Загружается через JS -->
+          </tbody>
+        </table>
+      </div>
+      <nav class="mt-4">
+        <ul
+          class="pagination justify-content-center"
+          id="orders-pagination"
+        ></ul>
+      </nav>
+    </main>
+    <div class="modal fade" id="viewModal" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header bg-info text-white">
+            <h5 class="modal-title">Детали заказа</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+            ></button>
+          </div>
+          <div class="modal-body" id="view-modal-body">
+            <!-- через JS -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="editModal" tabindex="-1">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header bg-warning">
+            <h5 class="modal-title">Редактирование заявки</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <form id="edit-form">
+              <input type="hidden" id="edit-order-id" />
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label class="form-label">Дата начала</label>
+                  <input
+                    type="date"
+                    id="edit-date"
+                    class="form-control"
+                    required
+                  />
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Время (начало)</label>
+                  <select id="edit-time" class="form-select">
+                    <option value="09:00">09:00</option>
+                    <option value="14:00">14:00</option>
+                    <option value="18:00">18:00</option>
+                  </select>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Кол-во студентов</label>
+                  <input
+                    type="number"
+                    id="edit-persons"
+                    class="form-control"
+                    min="1"
+                    max="20"
+                  />
+                </div>
+                <div class="col-md-12">
+                  <h6 class="fw-bold mt-2">Дополнительные опции:</h6>
+                  <div class="form-check">
+                    <input
+                      class="form-check-input"
+                      type="checkbox"
+                      id="edit-intensive"
+                    />
+                    <label class="form-check-label"
+                      >Интенсивный курс (+20%)</label
+                    >
+                  </div>
+                  <div class="form-check">
+                    <input
+                      class="form-check-input"
+                      type="checkbox"
+                      id="edit-supplementary"
+                    />
+                    <label class="form-check-label"
+                      >Учебные материалы (+2000 ₽/чел)</label
+                    >
+                  </div>
+                  <div class="form-check">
+                    <input
+                      class="form-check-input"
+                      type="checkbox"
+                      id="edit-personalized"
+                    />
+                    <label class="form-check-label"
+                      >Индивидуальные занятия (+1500 ₽/нед)</label
+                    >
+                  </div>
+                </div>
+              </div>
+              <div class="mt-4 d-flex justify-content-between">
+                <h5>Итого: <span id="edit-total-price">0</span> руб.</h5>
+                <button type="submit" class="btn btn-primary">
+                  Сохранить изменения
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal fade" id="deleteModal" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header bg-danger text-white">
+            <h5 class="modal-title">Подтверждение удаления</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+            ></button>
+          </div>
+          <div class="modal-body">
+            Вы уверены, что хотите удалить заявку
+            <strong id="delete-order-num"></strong>?
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Нет
+            </button>
+            <button
+              type="button"
+              class="btn btn-danger"
+              id="confirm-delete-btn"
+            >
+              Да
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/account.js"></script>
+  </body>
+</html>
