@@ -277,3 +277,82 @@ function showAlert(msg, type) {
     `;
   setTimeout(() => (container.innerHTML = ""), 5000);
 }
+
+// Яндекс.Карты, если не загрузит API - скриншоты работы в папке img
+const resources = [
+  {
+    coords: [55.7648, 37.6055],
+    name: "Библиотека им. Тургенева",
+    address: "Бобров пер., 6, стр. 1",
+    desc: "Большой выбор учебников и классической литературы.",
+    type: "Библиотека",
+  },
+  {
+    coords: [55.7415, 37.6519],
+    name: "Языковое кафе 'Лингва'",
+    address: "ул. Станиславского, 21",
+    desc: "Встречи разговорного клуба каждую субботу в 18:00.",
+    type: "Кафе",
+  },
+  {
+    coords: [55.7589, 37.6232],
+    name: "Культурный центр 'Зодчие'",
+    address: "Никольская ул., 7",
+    desc: "Бесплатные лекции по культуре и истории.",
+    type: "Клуб",
+  },
+];
+
+function initMap() {
+  if (typeof ymaps === "undefined") {
+    console.error("API Яндекс.Карт не загружен");
+    return;
+  }
+
+  ymaps.ready(() => {
+    const myMap = new ymaps.Map("map", {
+      center: [55.7532, 37.6225],
+      zoom: 12,
+      controls: ["zoomControl", "fullscreenControl"],
+    });
+
+    const locationsList = document.getElementById("map-locations-list");
+
+    resources.forEach((res, index) => {
+      const placemark = new ymaps.Placemark(
+        res.coords,
+        {
+          balloonContentHeader: `<strong class="text-primary">${res.name}</strong>`,
+          balloonContentBody: `
+                    <p>${res.address}</p>
+                    <small>${res.desc}</small>
+                `,
+          hintContent: res.name,
+        },
+        {
+          preset: "islands#blueEducationIcon",
+        }
+      );
+
+      myMap.geoObjects.add(placemark);
+
+      if (locationsList) {
+        const item = document.createElement("button");
+        item.className = "list-group-item list-group-item-action p-3";
+        item.innerHTML = `
+                    <div class="fw-bold">${res.name}</div>
+                    <small class="text-muted d-block">${res.type}</small>
+                `;
+        item.onclick = () => {
+          myMap.setCenter(res.coords, 15, { duration: 500 });
+          placemark.balloon.open();
+        };
+        locationsList.appendChild(item);
+      }
+    });
+  });
+}
+
+if (document.getElementById("map")) {
+  initMap();
+}
