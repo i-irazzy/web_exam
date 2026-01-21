@@ -124,6 +124,77 @@
         </nav>
       </section>
     </main>
+    <section
+      id="tutors-section"
+      class="container my-5 shadow-sm p-4 bg-white rounded border"
+    >
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+          <h2 class="mb-0">Наши репетиторы</h2>
+          <small class="text-muted" id="tutor-status-text"
+            >Выберите курс выше, чтобы увидеть подходящих специалистов</small
+          >
+        </div>
+        <button
+          class="btn btn-sm btn-outline-secondary"
+          onclick="resetTutorFilter()"
+        >
+          Показать всех
+        </button>
+      </div>
+      <div class="card bg-light border-0 mb-4">
+        <div class="card-body">
+          <form id="tutor-search-form" class="row g-3">
+            <div class="col-md-5">
+              <label class="form-label fw-bold">Квалификация</label>
+              <select
+                id="filter-tutor-level"
+                class="form-select"
+                onchange="renderTutorsTable()"
+              >
+                <option value="">Любой уровень</option>
+                <option value="Beginner">Начальный</option>
+                <option value="Intermediate">Средний</option>
+                <option value="Advanced">Продвинутый</option>
+              </select>
+            </div>
+            <div class="col-md-5">
+              <label class="form-label fw-bold">Минимальный опыт (лет)</label>
+              <input
+                type="number"
+                id="filter-tutor-exp"
+                class="form-control"
+                placeholder="Например: 3"
+                oninput="renderTutorsTable()"
+              />
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+              <button
+                type="button"
+                class="btn btn-outline-primary w-100"
+                onclick="resetTutorFilter()"
+              >
+                Сброс
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+      <div class="table-responsive">
+        <table class="table table-hover align-middle">
+          <thead class="table-light">
+            <tr>
+              <th>Имя</th>
+              <th>Уровень</th>
+              <th>Опыт</th>
+              <th>Ставка</th>
+              <th>Действие</th>
+            </tr>
+          </thead>
+          <tbody id="tutors-table-body"></tbody>
+        </table>
+      </div>
+    </section>
     <section class="container my-5" id="resources-map">
       <div class="d-flex justify-content-between align-items-center mb-4">
         <h2>Интерактивная карта ресурсов</h2>

@@ -6,6 +6,8 @@ let filteredCourses = [];
 let currentPage = 1;
 const recordsPerPage = 5;
 let selectedCourse = null;
+let allTutors = [];       
+let selectedLanguage = null; 
 
 document.addEventListener("DOMContentLoaded", () => {
   fetchCourses();
@@ -39,15 +41,20 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 async function fetchCourses() {
-  try {
-    const response = await fetch(`${BASE_URL}/courses?api_key=${API_KEY}`);
-    allCourses = await response.json();
-    applyFilters();
-  } catch (error) {
-    showAlert("Ошибка при загрузке курсов", "danger");
-    console.error(error);
-  }
+    try {
+        const response = await fetch(`${BASE_URL}/courses?api_key=${API_KEY}`);
+        allCourses = await response.json();
+        
+        const tutorResponse = await fetch(`${BASE_URL}/tutors?api_key=${API_KEY}`);
+        allTutors = await tutorResponse.json();
+
+        applyFilters(); 
+        renderTutorsTable();
+    } catch (error) {
+        showAlert('Ошибка при загрузке данных', 'danger');
+    }
 }
+
 
 function applyFilters() {
   const nameQuery = document.getElementById("search-name").value.toLowerCase();
@@ -78,7 +85,7 @@ function renderTable() {
             <td><span class="badge bg-info text-dark">${course.level}</span></td>
             <td>${course.teacher}</td>
             <td class="text-end">
-                <button class="btn btn-primary btn-sm px-3" onclick="openEnrollModal(${course.id})">Выбрать</button>
+                <button class="btn btn-primary btn-sm px-3" onclick="selectCourse(${course.id})">Выбрать</button>
             </td>
         </tr>
     `
@@ -276,6 +283,68 @@ function showAlert(msg, type) {
         </div>
     `;
   setTimeout(() => (container.innerHTML = ""), 5000);
+}
+
+function selectCourse(id) {
+    selectedCourse = allCourses.find(c => c.id === id);
+    if (!selectedCourse) return;
+
+    document.getElementById('tutor-status-text').innerHTML = 
+        `Выбран курс: <b class="text-primary">${selectedCourse.name}</b>. Показаны репетиторы направления: <b>${selectedLanguage || 'Все'}</b>`;
+
+    document.getElementById('tutors-section').scrollIntoView({ behavior: 'smooth' });
+
+    renderTutorsTable();
+}
+
+function renderTutorsTable() {
+    const tbody = document.getElementById('tutors-table-body');
+    const levelFilter = document.getElementById('filter-tutor-level').value;
+    const expFilter = parseInt(document.getElementById('filter-tutor-exp').value) || 0;
+
+    const filteredTutors = allTutors.filter(tutor => {
+        const matchLang = !selectedLanguage || tutor.languages_offered.includes(selectedLanguage);
+        const matchLevel = !levelFilter || tutor.language_level === levelFilter;
+        const matchExp = tutor.work_experience >= expFilter;
+        return matchLang && matchLevel && matchExp;
+    });
+
+    tbody.innerHTML = filteredTutors.map(tutor => `
+        <tr>
+            <td class="fw-bold">${tutor.name}</td>
+            <td><span class="badge bg-secondary">${tutor.language_level}</span></td>
+            <td>${tutor.work_experience} лет</td>
+            <td>${tutor.price_per_hour} ₽/ч</td>
+            <td>
+                <button class="btn ${selectedCourse ? 'btn-success' : 'btn-outline-secondary'} btn-sm" 
+                        onclick="handleTutorClick(${tutor.id})">
+                    ${selectedCourse ? 'Записаться' : 'Сначала выберите курс'}
+                </button>
+            </td>
+        </tr>
+    `).join('');
+}
+
+function handleTutorClick(tutorId) {
+    if (!selectedCourse) {
+        showAlert('Пожалуйста, сначала выберите языковой курс в таблице выше!', 'warning');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        return;
+    }
+    openEnrollWithTutor(tutorId);
+}
+
+function resetTutorFilter() {
+    selectedLanguage = null;
+    selectedCourse = null;
+    document.getElementById('tutor-status-text').innerText = "Выберите курс выше, чтобы увидеть подходящих специалистов";
+    document.getElementById('tutor-search-form').reset();
+    renderTutorsTable();
+}
+function getYearWord(n) {
+    if (n % 10 === 1 && n % 100 !== 11) return "год";
+    if ([2, 3, 4].includes(n % 10) && ![12, 13, 14].includes(n % 100)) return "года";
+    return "лет";
 }
 
 // Яндекс.Карты, если не загрузит API - скриншоты работы в папке img
